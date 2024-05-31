@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.example.inventory.ui.item
 
@@ -8,10 +23,7 @@ import androidx.lifecycle.ViewModel
 import com.example.inventory.data.Item
 import com.example.inventory.data.ItemsRepository
 import java.text.NumberFormat
-
-
-class ItemEntryViewModel (private val itemsRepository: ItemsRepository) : ViewModel() {
-
+class ItemEntryViewModel(private val itemsRepository: ItemsRepository) : ViewModel() {
 
     var itemUiState by mutableStateOf(ItemUiState())
         private set
@@ -21,14 +33,15 @@ class ItemEntryViewModel (private val itemsRepository: ItemsRepository) : ViewMo
             ItemUiState(itemDetails = itemDetails, isEntryValid = validateInput(itemDetails))
     }
 
-    private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {
-        return with(uiState) {
-            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
-        }
-    }
     suspend fun saveItem() {
         if (validateInput()) {
             itemsRepository.insertItem(itemUiState.itemDetails.toItem())
+        }
+    }
+
+    private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {
+        return with(uiState) {
+            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
         }
     }
 }
@@ -44,6 +57,7 @@ data class ItemDetails(
     val price: String = "",
     val quantity: String = "",
 )
+
 fun ItemDetails.toItem(): Item = Item(
     id = id,
     name = name,
@@ -54,6 +68,7 @@ fun ItemDetails.toItem(): Item = Item(
 fun Item.formatedPrice(): String {
     return NumberFormat.getCurrencyInstance().format(price)
 }
+
 
 fun Item.toItemUiState(isEntryValid: Boolean = false): ItemUiState = ItemUiState(
     itemDetails = this.toItemDetails(),
